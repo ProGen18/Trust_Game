@@ -19,7 +19,7 @@ def mock_openai_response(content="Bonjour !"):
     return response
 
 
-@patch("chatgpt.client")
+@patch("config.openai_client")
 def test_chat_with_gpt_basic(mock_client):
     """Teste un échange simple : envoi d'un message et réception d'une réponse GPT."""
     from chatgpt import chat_with_gpt, C
@@ -36,7 +36,7 @@ def test_chat_with_gpt_basic(mock_client):
     assert C.BOT_PREFIX + "Salut !" in player.gpt_history
 
 
-@patch("chatgpt.client")
+@patch("config.openai_client")
 def test_chat_with_gpt_history_accumulates(mock_client):
     """Vérifie que l'historique s'accumule correctement après plusieurs messages."""
     from chatgpt import chat_with_gpt, C
@@ -57,7 +57,7 @@ def test_chat_with_gpt_history_accumulates(mock_client):
     assert C.BOT_PREFIX + "Réponse 2" in history
 
 
-@patch("chatgpt.client")
+@patch("config.openai_client")
 def test_chat_with_gpt_sends_correct_messages_to_api(mock_client):
     """Vérifie que les messages envoyés à l'API OpenAI sont correctement formatés."""
     from chatgpt import chat_with_gpt
@@ -79,7 +79,7 @@ def test_chat_with_gpt_sends_correct_messages_to_api(mock_client):
     assert messages[-1] == {"role": "user", "content": "Test"}
 
 
-@patch("chatgpt.client")
+@patch("config.openai_client")
 def test_chat_with_gpt_rebuilds_history_for_api(mock_client):
     """Vérifie que l'historique existant est correctement reconstruit pour l'API."""
     from chatgpt import chat_with_gpt, C
@@ -100,7 +100,7 @@ def test_chat_with_gpt_rebuilds_history_for_api(mock_client):
     assert messages[4] == {"role": "user", "content": "Nouveau"}
 
 
-@patch("chatgpt.client")
+@patch("config.openai_client")
 def test_chat_with_gpt_api_error(mock_client):
     """Teste la gestion d'erreur lorsque l'API OpenAI échoue."""
     from chatgpt import chat_with_gpt
@@ -116,7 +116,7 @@ def test_chat_with_gpt_api_error(mock_client):
     assert "indisponible" in result[1]["message"]
 
 
-@patch("chatgpt.client")
+@patch("config.openai_client")
 def test_chat_with_gpt_empty_history(mock_client):
     """Teste le comportement avec un historique vide (premier message)."""
     from chatgpt import chat_with_gpt
