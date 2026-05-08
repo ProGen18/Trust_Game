@@ -4,7 +4,7 @@ Calcule et affiche le montant total accumulé par le participant à travers
 toutes les applications de la session (Show Up Fee, Risk Aversion, Trust Game).
 """
 from otree.api import *
-import settings
+import config
 
 
 class C(BaseConstants):
@@ -12,9 +12,9 @@ class C(BaseConstants):
     NAME_IN_URL = "results"
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
-    
-    SHOW_UP_FEE = cu(settings.SHOW_UP_FEE)
-    CONVERSION_RATE = settings.CONVERSION_RATE
+
+    SHOW_UP_FEE = cu(config.SHOW_UP_FEE)
+    CONVERSION_RATE = config.CONVERSION_RATE
 
 
 class Subsession(BaseSubsession):
@@ -27,8 +27,8 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     """Stocke le bilan financier final du participant."""
-    gain_total = models.CurrencyField(doc="Somme totale des gains en jetons (toutes applis confondues).")
-    gain_euros = models.FloatField(doc="Conversion finale des jetons en euros réels.")
+    gain_total = models.CurrencyField(doc="Somme totale des gains en euros (toutes applis confondues).")
+    gain_euros = models.FloatField(doc="Gain final en euros (identique à gain_total avec CONVERSION_RATE=1.0).")
 
 
 # PAGES
@@ -67,23 +67,23 @@ class Results(Page):
                 "tg_sent": sent,
                 "tg_multiplier": mult,
                 "tg_sent_back": sent_back,
-                "tg_gain": tg_gain,
+                "tg_gain": int(tg_gain),
             }
 
         player.gain_total += gain_risk_aversion
         player.gain_euros = round(float(player.gain_total * C.CONVERSION_RATE), 2)
 
         return {
-            "show_up_fee": C.SHOW_UP_FEE,
+            "show_up_fee": int(C.SHOW_UP_FEE),
             "chosen_decision": vars["chosen_decision"],
             "invested": vars["invested"],
             "ball_color": vars["ball_color"],
-            "initial_amount": vars["initial_amount"],
-            "profit_risk_aversion": vars["profit_risk_aversion"],
-            "gain_risk_aversion": gain_risk_aversion,
-            "gain_total": player.gain_total,
+            "initial_amount": int(vars["initial_amount"]),
+            "profit_risk_aversion": int(vars["profit_risk_aversion"]),
+            "gain_risk_aversion": int(gain_risk_aversion),
+            "gain_total": int(player.gain_total),
             "tg_role": tg_role,
-            "tg_gain": cu(0),
+            "tg_gain": int(tg_gain) if tg_role else 0,
             "converted_gain": player.gain_euros,
         } | vars_tg
 
