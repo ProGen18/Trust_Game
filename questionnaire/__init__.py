@@ -1,132 +1,29 @@
 from otree.api import *
 from datetime import datetime
-import settings
+import config
 
 class C(BaseConstants):
     """Constantes et options de réponses pour le questionnaire."""
     NAME_IN_URL = "questionnaire"
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
-    
-    # Mapping des ordres d'étapes selon la configuration de session
-    ORDRES_ETAPES = ["Ordre non défini", "Q/A/TG", "A/Q/TG", "Q/TG/A"]
-    SHOW_UP_FEE = settings.SHOW_UP_FEE
 
-    # Q1 choices
-    Q1_CHOICES = [
-        [1, "Jamais"],
-        [2, "Rarement (quelques fois par an)"],
-        [3, "Occasionnellement (quelques fois par mois)"],
-        [4, "Régulièrement (plusieurs fois par semaine)"],
-        [5, "Quotidiennement"],
-    ]
+    ORDRES_ETAPES = config.ORDRES_ETAPES
+    SHOW_UP_FEE = config.SHOW_UP_FEE
 
-    # Q3 choices
-    Q3_CHOICES = [
-        [1, "Je n'en utilise pas"],
-        [2, "Moins de 6 mois"],
-        [3, "Entre 6 mois et 1 an"],
-        [4, "Entre 1 et 2 ans"],
-        [5, "Plus de 2 ans"],
-    ]
-
-    # Q4 choices
-    Q4_CHOICES = [
-        [1, "Non, aucune"],
-        [2, "Oui, de manière informelle (articles, vidéos, podcasts)"],
-        [3, "Oui, dans le cadre de mes études ou de ma formation professionnelle"],
-        [4, "Oui, j'ai suivi une formation dédiée (MOOC, certification, etc.)"],
-    ]
-
-    # Q6-Q12: Likert 1-7
-    LIKERT_7_CHOICES = [
-        [1, "1 - Pas du tout d'accord"],
-        [2, "2"],
-        [3, "3"],
-        [4, "4 - Ni d'accord ni en désaccord"],
-        [5, "5"],
-        [6, "6"],
-        [7, "7 - Tout à fait d'accord"],
-    ]
-
-    # Q13-Q31: Likert 1-7
-    LIKERT_5_CHOICES = [
-        [1, "1 - Pas du tout d'accord"],
-        [2, "2"],
-        [3, "3"],
-        [4, "4 - Ni d'accord ni en désaccord"],
-        [5, "5"],
-        [6, "6"],
-        [7, "7 - Tout à fait d'accord"],
-    ]
-
-    # Q33 choices
-    Q33_CHOICES = [
-        [1, "Femme"],
-        [2, "Homme"],
-        [3, "Je préfère ne pas répondre"],
-    ]
-
-    # Q34 choices
-    Q34_CHOICES = [
-        [1, "Brevet des collèges ou moins"],
-        [2, "Baccalauréat (ou équivalent)"],
-        [3, "Bac+2 / BTS / DUT"],
-        [4, "Licence (Bac+3)"],
-        [5, "Master (Bac+5)"],
-        [6, "Doctorat"],
-        [7, "Autre"],
-    ]
-
-    # Q35 choices
-    Q35_CHOICES = [
-        [1, "Sciences économiques, gestion, finance"],
-        [2, "Sciences sociales, psychologie, sociologie"],
-        [3, "Sciences exactes, ingénierie, informatique"],
-        [4, "Droit, sciences politiques"],
-        [5, "Lettres, arts, sciences humaines"],
-        [6, "Santé, médecine"],
-        [7, "Autre"],
-    ]
-
-    # Q36 choices
-    Q36_CHOICES = [
-        [1, "Moins de 1 000 €"],
-        [2, "1 000 – 1 999 €"],
-        [3, "2 000 – 2 999 €"],
-        [4, "3 000 – 3 999 €"],
-        [5, "4 000 € et plus"],
-        [6, "Je préfère ne pas répondre"],
-    ]
-
-    # Q37 choices
-    Q37_CHOICES = [
-        [1, "Étudiant(e)"],
-        [2, "Salarié(e) du secteur privé"],
-        [3, "Salarié(e) du secteur public"],
-        [4, "Travailleur(se) indépendant(e) / freelance"],
-        [5, "Sans emploi"],
-        [6, "Retraité(e)"],
-        [7, "Autre"],
-    ]
-
-    # Q39 choices
-    Q39_CHOICES = [
-        [1, "Non, jamais"],
-        [2, "Oui, une ou deux fois"],
-        [3, "Oui, plusieurs fois (3–4 fois)"],
-        [4, "Oui, régulièrement (5 fois ou plus)"],
-    ]
-
-    # Q40 choices
-    Q40_CHOICES = [
-        [1, "Non"],
-        [2, "Oui, une ou deux fois"],
-        [3, "Oui, plusieurs fois"],
-    ]
-
-    # SVO items : 9 options par item (Option 1 à Option 9)
-    SVO_CHOICES = [[i, str(i)] for i in range(1, 10)]
+    Q1_CHOICES = config.Q1_CHOICES
+    Q3_CHOICES = config.Q3_CHOICES
+    Q4_CHOICES = config.Q4_CHOICES
+    LIKERT_7_CHOICES = config.LIKERT_7_CHOICES
+    LIKERT_5_CHOICES = config.LIKERT_5_CHOICES
+    Q33_CHOICES = config.Q33_CHOICES
+    Q34_CHOICES = config.Q34_CHOICES
+    Q35_CHOICES = config.Q35_CHOICES
+    Q36_CHOICES = config.Q36_CHOICES
+    Q37_CHOICES = config.Q37_CHOICES
+    Q39_CHOICES = config.Q39_CHOICES
+    Q40_CHOICES = config.Q40_CHOICES
+    SVO_CHOICES = config.SVO_CHOICES
 
 class Subsession(BaseSubsession):
     pass
@@ -221,8 +118,8 @@ class Player(BasePlayer):
     q36 = models.IntegerField(label="Q36. Dans quelle tranche se situe votre revenu mensuel net personnel (en euros) ?", choices=C.Q36_CHOICES, widget=widgets.RadioSelect)
     q37 = models.IntegerField(label="Q37. Quelle est votre situation professionnelle actuelle ?", choices=C.Q37_CHOICES, widget=widgets.RadioSelect)
     q38 = models.StringField(label="Q38. Dans quel pays résidez-vous actuellement ?")
-    q39 = models.IntegerField(label="Q39. Avez-vous déjà participé à une expérience économique (jeu de confiance, dilemme du prisonnier, jeu de l'ultimatum…) ?", choices=C.Q39_CHOICES, widget=widgets.RadioSelect)
-    q40 = models.IntegerField(label="Q40. Avez-vous déjà participé spécifiquement à un jeu de confiance (Trust Game) avant aujourd'hui ?", choices=C.Q40_CHOICES, widget=widgets.RadioSelect)
+    q39 = models.IntegerField(label="Q39. Avez-vous déjà participé à une expérience économique (Jeu experimental, dilemme du prisonnier, jeu de l'ultimatum…) ?", choices=C.Q39_CHOICES, widget=widgets.RadioSelect)
+    q40 = models.IntegerField(label="Q40. Avez-vous déjà participé spécifiquement à un Jeu experimental (Trust Game) avant aujourd'hui ?", choices=C.Q40_CHOICES, widget=widgets.RadioSelect)
 
 
 # ==== PAGES ====
@@ -243,7 +140,14 @@ class Welcome(Page):
         player.date = datetime.now().strftime("%d-%b-%y")
         player.participant.vars["show_up_fee"] = C.SHOW_UP_FEE
 
+def go_back_live_method(player, data):
+    if data.get('go_back'):
+        if player._index_in_pages > 1:
+            player._index_in_pages -= 1
+        return {player.id_in_group: {'go_back_success': True}}
+
 class Part1(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = [
         "q1", 
@@ -257,6 +161,7 @@ class Part1(Page):
             player.go_back = False
 
 class Part2(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = ["q6", "q7", "q8", "q9", "q10", "q11", "q12"]
     def before_next_page(player, timeout_happened):
@@ -265,6 +170,7 @@ class Part2(Page):
             player.go_back = False
 
 class Part3(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = ["q13", "q14", "q15", "q16", "q17", "q18", "q19"]
     def before_next_page(player, timeout_happened):
@@ -273,6 +179,7 @@ class Part3(Page):
             player.go_back = False
 
 class Part4(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = ["svo_item_1", "svo_item_2", "svo_item_3", "svo_item_4", "svo_item_5", "svo_item_6"]
     def before_next_page(player, timeout_happened):
@@ -281,6 +188,7 @@ class Part4(Page):
             player.go_back = False
 
 class Part5(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = ["q20", "q21", "q22", "q23", "q24", "q25"]
     def before_next_page(player, timeout_happened):
@@ -289,6 +197,7 @@ class Part5(Page):
             player.go_back = False
 
 class Part6(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = ["q26", "q27", "q28", "q29", "q30", "q31"]
     def before_next_page(player, timeout_happened):
@@ -297,6 +206,7 @@ class Part6(Page):
             player.go_back = False
 
 class Part7(Page):
+    live_method = go_back_live_method
     form_model = "player"
     form_fields = ["q32", "q33", "q34", "q35", "q35_autre", "q36", "q37", "q38", "q39", "q40"]
     def before_next_page(player, timeout_happened):
