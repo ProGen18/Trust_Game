@@ -13,17 +13,17 @@ Vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}
   <div class="info-card">
     <div class="intro-section">
       <p class="intro-text">
-        Au cours des 4 prochaines décisions, vous allez devoir choisir le montant que vous souhaitez investir dans un jeu de hasard, en misant entre 0 et <strong class="highlight">{{ C.MAX_INVESTMENT }}</strong> de vos jetons disponibles.
+        Au cours des 4 prochaines décisions, vous allez devoir choisir le montant que vous souhaitez investir dans un jeu de hasard, en misant entre 0 et <strong class="highlight">{{ C.MAX_INVESTMENT }}€</strong>.
       </p>
 
       <div class="options-list">
           <div class="option-item">
               <div class="option-icon"><i class="fa-solid fa-coins" class="icon--rust"></i></div>
-              <div class="option-text">Vous pouvez conserver vos jetons (ou en perdre un montant fixe).</div>
+              <div class="option-text">Vous pouvez conserver votre argent (ou en perdre un montant fixe).</div>
           </div>
           <div class="option-item">
               <div class="option-icon"><i class="fa-solid fa-dice" class="icon--ink"></i></div>
-              <div class="option-text">OU investir tout ou une partie de ces jetons dans le tirage d'une urne.</div>
+              <div class="option-text">OU investir tout ou une partie de cet argent dans le tirage d'une urne.</div>
           </div>
       </div>
     </div>
@@ -65,7 +65,7 @@ Vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}
  </div>
 
  <div class="button-container">
-    <button type="button" class="btn btn-back" onclick="window.history.back()">← Retour</button>
+    <button type="button" class="btn btn-back" onclick="liveSend({'go_back': true})">← Retour</button>
     {{ next_button }}
  </div>
 
@@ -73,4 +73,14 @@ Vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}
 
 
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
 {% endblock %}

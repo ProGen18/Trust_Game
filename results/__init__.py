@@ -27,17 +27,16 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     """Stocke le bilan financier final du participant."""
-    gain_total = models.CurrencyField(doc="Somme totale des gains en euros (toutes applis confondues).")
-    gain_euros = models.FloatField(doc="Gain final en euros (identique à gain_total avec CONVERSION_RATE=1.0).")
+    gain_total = models.CurrencyField()
+    gain_euros = models.FloatField()
 
 
 # PAGES
 
 
-
 class Results(Page):
     """Page finale récapitulant l'ensemble des gains de la session expérimentale."""
-    
+
     def vars_for_template(player: Player):
         """Agrège les résultats stockés dans participant.vars et calcule le gain final."""
         player.gain_total = C.SHOW_UP_FEE
@@ -48,7 +47,6 @@ class Results(Page):
         tg_role = vars.get("tg_role")
         vars_tg = {}
 
-        # Intégration optionnelle des résultats du Trust Game (si joué)
         if tg_role:
             endowment = int(vars.get("tg_endowment"))
             mult = int(vars.get("tg_multiplier"))
@@ -87,5 +85,32 @@ class Results(Page):
             "converted_gain": player.gain_euros,
         } | vars_tg
 
+    def before_next_page(player: Player, timeout_happened):
+        if config.BILENDI_ENABLED:
+            from bilendi.services import complete_participant
+            complete_participant(player.participant)
 
-page_sequence = [Results]
+
+class BilendiCompletion(Page):
+    """Page de confirmation pour les participants Bilendi — affiche le statut final."""
+    template_name = "results/BilendiCompletion.html"
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return config.BILENDI_ENABLED and bool(
+            player.participant.vars.get("bilendi_id")
+        )
+
+    def vars_for_template(player: Player):
+        from bilendi.services import compute_total_gain
+        gain = compute_total_gain(player.participant)
+        return {
+            "bilendi_id": player.participant.vars.get("bilendi_id", ""),
+            "total_gain": gain,
+        }
+
+
+if config.BILENDI_ENABLED:
+    page_sequence = [Results, BilendiCompletion]
+else:
+    page_sequence = [Results]

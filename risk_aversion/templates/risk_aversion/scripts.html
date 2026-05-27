@@ -35,7 +35,7 @@
     const pl_invested = isPlural(invested);
     let s;
 
-    result = "Vous misez <strong> "+ invested +" </strong> jeton" + pl_invested + " et conservez <strong>" + kept_value + "</strong> jeton" + pl_kept;
+    result = "Vous misez <strong> "+ invested +" </strong>€ et conservez <strong>" + kept_value + "</strong>€";
 
     if (current_decision == 3 || current_decision == 4) {
       if(kept_value != 0 ) {
@@ -63,11 +63,11 @@
   function update_D1_D2(kept_value, invested) {
     const pl_kept = isPlural(kept_value);
     const pl_invested = isPlural(invested)
-    const yellow = kept_value + " jeton"+ pl_kept + " conservé" + pl_kept + 
-    " + 3 x " + invested + " jeton" + pl_invested + " gagné" + pl_invested + " = " +
-      (kept_value + 3 * invested) + " jetons";
+    const yellow = kept_value + "€ conservé" + pl_kept +
+    " + 3 x " + invested + "€ gagné" + pl_invested + " = " +
+      (kept_value + 3 * invested) + "€";
 
-    const purple = kept_value + " jeton"+ pl_kept +" conservé" + pl_kept;
+    const purple = kept_value + "€ conservé" + pl_kept;
 
     return { yellow, purple };
   }
@@ -78,14 +78,14 @@
     const pl_invested = isPlural(invested);
 
     if ( invested == "0" || invested == "") {
-      yellow = purple = "Vous perdez les 10 jetons";
+      yellow = purple = "Vous perdez les " + max_investment + "€";
     } else {
-      yellow = purple = "Vous perdez " + kept_value + " jeton" + pl_kept + " non-investi" + pl_kept;
-      stringEnd = " (au lieu des " + max_investment + " jetons initiaux)";
+      yellow = purple = "Vous perdez " + kept_value + "€ non-investi" + pl_kept;
+      stringEnd = " (au lieu des " + max_investment + "€ initiaux)";
 
       yellow += stringEnd;
 
-      purple +=" + 3 x " + invested + " jeton" + pl_invested + " investi" + pl_invested + " ="+ kept_value + "+"+ 3*invested + "="+(kept_value + 3 * invested) + " jetons perdus" + stringEnd;
+      purple +=" + 3 x " + invested + "€ investi" + pl_invested + " ="+ kept_value + "+"+ 3*invested + "="+(kept_value + 3 * invested) + "€ perdus" + stringEnd;
     }
     return { yellow, purple };
   }
@@ -95,3 +95,12 @@
     document.addEventListener("DOMContentLoaded", updateMessage);
   }
 </script>
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
+{% endblock %}

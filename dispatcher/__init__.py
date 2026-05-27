@@ -25,7 +25,7 @@ class C(BaseConstants):
     
     # Identifiants d'administration par défaut (si nécessaire pour scripts externes)
     USERNAME = "admin"
-    PASSWORD = "admin"
+    PASSWORD = os.environ.get("ADMIN_KEY", "UPJV!2026")
 
 
 class Subsession(BaseSubsession):
@@ -82,6 +82,15 @@ class Welcome(Page):
 
 class Dispatch(Page):
     """Page de transition générant le lien vers la session oTree spécifique au groupe."""
+
+    @staticmethod
+    def is_displayed(player: Player):
+        # En mode Bilendi, le participant fait toute l'étude dans la même
+        # session (pas de redirection vers groupe_1/2/3) → on saute Dispatch.
+        if player.session.config.get("bilendi_mode", False):
+            return False
+        return True
+
     @staticmethod
     def vars_for_template(player: Player):
         """Prépare l'URL de redirection en fonction de l'environnement (Local vs Production)."""

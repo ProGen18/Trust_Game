@@ -392,19 +392,38 @@ class SyncWaitPage(WaitPage):
         return not player.session.config.get("demo_mode", False)
 
     @staticmethod
+    def get_timeout_seconds(player: Player):
+        if config.BILENDI_ENABLED and player.participant.vars.get("bilendi_id"):
+            return config.BILENDI_RECONNECT_TIMEOUT
+        return None
+
+    @staticmethod
     def vars_for_template(player: Player):
         other_player = player.get_others_in_group()[0]
-        other_participant_number = other_player.participant.id_in_session
         return {
             "other_player": other_player,
-            "other_participant_number": other_participant_number,
+            "other_participant_number": other_player.participant.id_in_session,
+            "is_bilendi": bool(player.participant.vars.get("bilendi_id")),
         }
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened):
+        if timeout_happened:
+            player.participant.vars["trust_game_skipped"] = True
+            player.participant.vars["trust_game_skip_reason"] = "partner_timeout"
+            player.participant.vars["tg_sent"] = 0
+            player.participant.vars["tg_sent_back"] = 0
+            player.participant.vars["tg_role"] = "A" if player.id_in_group == 1 else "B"
+            player.participant.vars["tg_endowment"] = C.ENDOWMENT
+            player.participant.vars["tg_multiplier"] = C.MULTIPLIER
 
 
 class GamePlay(Page):
 
     @staticmethod
     def is_displayed(player: Player):
+        if player.participant.vars.get("trust_game_skipped"):
+            return False
         if player.session.config.get("demo_mode", False):
             return player.id_in_group == 1
         return True
@@ -458,10 +477,15 @@ class GamePlay(Page):
 
         # heartbeat : le client envoie {"ping": true} toutes les 30s
         if "ping" in data:
+            group = player.group
             responses = {}
-            for p in player.group.get_players():
+            for p in group.get_players():
                 if p.id_in_group != player.id_in_group:
                     responses[p.id_in_group] = {"partner_alive": True}
+                    if p.participant_left:
+                        p.participant_left = False
+                        p.participant.vars.pop("partner_left_at", None)
+                        responses[p.id_in_group]["partner_back"] = True
             return responses
 
         # le client signale qu'il quitte (beforeunload)
@@ -473,8 +497,24 @@ class GamePlay(Page):
             for p in player.group.get_players():
                 if p.id_in_group != player.id_in_group:
                     p.participant_left = True
-                    responses[p.id_in_group] = {"partner_left": True}
+                    p.participant.vars["partner_left_at"] = time.time()
+                    is_bilendi = bool(p.participant.vars.get("bilendi_id"))
+                    responses[p.id_in_group] = {
+                        "partner_left": True,
+                        "reconnect_timeout": config.BILENDI_RECONNECT_TIMEOUT if is_bilendi else 0,
+                    }
             return responses
+
+        # timeout de reconnexion expiré côté client (Bilendi)
+        if "reconnect_timeout" in data:
+            player.participant.vars["trust_game_skipped"] = True
+            player.participant.vars["trust_game_skip_reason"] = "partner_disconnected"
+            player.participant.vars["tg_sent"] = 0
+            player.participant.vars["tg_sent_back"] = 0
+            player.participant.vars["tg_role"] = "A" if player.id_in_group == 1 else "B"
+            player.participant.vars["tg_endowment"] = C.ENDOWMENT
+            player.participant.vars["tg_multiplier"] = C.MULTIPLIER
+            return {player.id_in_group: {"status": "skipped", "can_proceed": True}}
 
         return None
 
@@ -523,6 +563,10 @@ class Results(Page):
 
     @staticmethod
     def is_displayed(player: Player):
+        if player.participant.vars.get("trust_game_skipped"):
+            return False
+        if player.session.config.get("demo_mode", False) and player.id_in_group == 2:
+            return False
         return True
 
     @staticmethod

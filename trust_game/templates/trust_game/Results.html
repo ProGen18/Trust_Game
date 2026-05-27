@@ -12,26 +12,19 @@
   <!-- Lignes de résultats (révélées progressivement par JS) -->
   {% if player.id_in_group == 1 %}
   <p class="result-row" id="row-role"><span class="result-row__label">Votre rôle</span><span class="result-row__value">Joueur A</span></p>
-  <p class="result-row" id="row-endowment"><span class="result-row__label">Dotation initiale</span><span class="result-row__value">{{ C.ENDOWMENT }} jetons</span></p>
-  <p class="result-row" id="row-sent"><span class="result-row__label">Envoyé au Joueur B</span><span class="result-row__value">{{ sent }} jeton(s)</span></p>
-  <p class="result-row" id="row-tripled"><span class="result-row__label">Joueur B a reçu (×{{ C.MULTIPLIER }})</span><span class="result-row__value">{{ tripled }} jetons</span></p>
-  <p class="result-row" id="row-back"><span class="result-row__label">Renvoyé par le Joueur B</span><span class="result-row__value">{{ sent_back }} jeton(s)</span></p>
-  <p class="result-row result-row--total" id="row-total"><span class="result-row__label">Votre gain final</span><span class="result-row__value">{{ payoff }} jetons</span></p>
+  <p class="result-row" id="row-endowment"><span class="result-row__label">Dotation initiale</span><span class="result-row__value">{{ C.ENDOWMENT|to0 }}€</span></p>
+  <p class="result-row" style="padding-left: 20px;" id="row-sent"><span class="result-row__label">Envoyé au Joueur B</span><span class="result-row__value">{{ sent|to0 }}€</span></p>
+  <p class="result-row" id="row-tripled"><span class="result-row__label">Joueur B a reçu (×{{ C.MULTIPLIER }})</span><span class="result-row__value">{{ tripled|to0 }}€</span></p>
+  <p class="result-row" style="padding-left: 20px;" id="row-back"><span class="result-row__label">Renvoyé par le Joueur B</span><span class="result-row__value">{{ sent_back|to0 }}€</span></p>
+  <p class="result-row result-row--total" id="row-total"><span class="result-row__label">Votre gain final</span><span class="result-row__value"><span style="font-size: 0.9em; color: #666; margin-right: 10px;">({{ C.ENDOWMENT|to0 }} - {{ sent|to0 }} + {{ sent_back|to0 }} =)</span>{{ payoff|to0 }}€</span></p>
   {% else %}
   <p class="result-row" id="row-role"><span class="result-row__label">Votre rôle</span><span class="result-row__value">Joueur B</span></p>
-  <p class="result-row" id="row-tripled"><span class="result-row__label">Reçu du Joueur A (×{{ C.MULTIPLIER }})</span><span class="result-row__value">{{ tripled }} jetons</span></p>
-  <p class="result-row" id="row-back"><span class="result-row__label">Renvoyé au Joueur A</span><span class="result-row__value">{{ sent_back }} jeton(s)</span></p>
-  <p class="result-row result-row--total" id="row-total"><span class="result-row__label">Votre gain final</span><span class="result-row__value">{{ payoff }} jetons</span></p>
+  <p class="result-row" id="row-tripled"><span class="result-row__label">Reçu du Joueur A (×{{ C.MULTIPLIER }})</span><span class="result-row__value">{{ tripled|to0 }}€</span></p>
+  <p class="result-row" style="padding-left: 20px;" id="row-back"><span class="result-row__label">Renvoyé au Joueur A</span><span class="result-row__value">{{ sent_back|to0 }}€</span></p>
+  <p class="result-row result-row--total" id="row-total"><span class="result-row__label">Votre gain final</span><span class="result-row__value"><span style="font-size: 0.9em; color: #666; margin-right: 10px;">({{ tripled|to0 }} - {{ sent_back|to0 }} =)</span>{{ payoff|to0 }}€</span></p>
   {% endif %}
 
-  {% if player.chat_history %}
-  <div class="result-row result-row--vertical" id="row-chat">
-    <span class="result-row__label">Conversation</span>
-    <div id="final-chat-history" class="chat-messages chat-history-box">
-      {{ player.chat_history|safe }}
-    </div>
-  </div>
-  {% endif %}
+
 
 </div>
 

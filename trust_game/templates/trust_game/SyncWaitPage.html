@@ -7,6 +7,12 @@
   <div class="dots-loader" aria-label="Chargement">
     <span></span><span></span><span></span>
   </div>
+  {% if is_bilendi %}
+  <p class="wait-page__hint wait-page__hint--bilendi">
+    Si aucun autre participant ne se connecte dans <strong>5 minutes</strong>, cette étape sera automatiquement sautée et vous passerez à la suite de l'expérience.
+  </p>
+  {% else %}
   <p class="wait-page__hint">Cette page se mettra à jour automatiquement.<br>L'expérimentateur est disponible si vous avez besoin d'aide.</p>
+  {% endif %}
 </div>
 {% endblock %}

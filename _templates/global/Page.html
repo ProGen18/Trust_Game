@@ -18,10 +18,11 @@
 <script>
 /* ── Header + progression Rouille & Parchemin ── */
 (function() {
-  const STEPS = ['Questionnaire','Risque','Jeu','Résultats'];
+  const STEPS = ['Questionnaire', "Jeu de l'urne", 'Jeu experimental', 'Résultats'];
   const stepMap = {
     'questionnaire': 1,
     'risk_aversion': 2,
+    'trust_game':    3,
     'tg':            3,
     'results':       4,
   };
@@ -35,21 +36,15 @@
   }
   if (!stepNum) return;
 
-  const label = STEPS[stepNum - 1];
-
   document.addEventListener('DOMContentLoaded', function() {
     /* ── Header ── */
     const header = document.createElement('div');
     header.className = 'page-header';
     header.innerHTML =
-      '<span class="page-header__logo">Jeu de confiance</span>' +
+      "<span class=\"page-header__logo\">L'expérimentation</span>" +
       '<div class="page-header__badges">' +
-        '<span class="badge badge--step">' + stepNum + '/' + TOTAL + '</span>' +
+        '<span class="badge badge--step">' + stepNum + ' / ' + TOTAL + '</span>' +
       '</div>';
-      
-    const stepNumBg = document.createElement('span');
-    stepNumBg.className = 'page-header__step-num';
-    stepNumBg.textContent = String(stepNum).padStart(2,'0');
 
     /* ── Progress ticks (mobile) ── */
     const ticksHtml = Array.from({length: TOTAL}, function(_,i) {
@@ -82,7 +77,6 @@
 
     /* ── Injection avant le contenu oTree ── */
     const body = document.body;
-    body.insertBefore(stepNumBg, body.firstChild);
     body.insertBefore(stepper, body.firstChild);
     body.insertBefore(ticks,  body.firstChild);
     body.insertBefore(header, body.firstChild);

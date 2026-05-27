@@ -1,10 +1,81 @@
 {% extends "global/Page.html" %}
 {% load static %}
 {% block title %}
-  {% if player.id_in_group == 1 %}Joueur A — Jeu de Confiance{% else %}Joueur B — Jeu de Confiance{% endif %}
+  {% if player.id_in_group == 1 %}Joueur A — Jeu expérimental{% else %}Joueur B — Jeu expérimental{% endif %}
+{% endblock %}
+
+{% block styles %}
+<style>
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: white; padding: 2rem; border-radius: 8px; max-width: 600px;
+  text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.modal-content p {
+  text-align: left; margin-bottom: 1rem;
+}
+</style>
 {% endblock %}
 
 {% block content %}
+
+{% if has_chat_gpt and not player.popup_accepted %}
+<div id="ai-popup" class="modal-overlay">
+  <div class="modal-content">
+    <h4>Information importante</h4>
+    <p>
+      Dans cette étude, vous et votre partenaire pouvez consulter un <strong>assistant basé sur une Intelligence Artificielle (IA) générative</strong> conçu pour vous aider à réfléchir à vos décisions. Cet assistant connaît les règles du jeu, mais ne connaît pas les décisions des autres participants et ne peut pas prédire leur comportement. Vous ne connaîtrez pas la teneur des échanges que votre partenaire a eu avec son assistant et de même votre partenaire n'a pas connaissance de vos échanges avec votre IA.
+    </p>
+    <p>
+      De plus, l'assistant peut formuler ses messages selon différents modes de raisonnement, qui peuvent varier d'un·e participant·e à l'autre. Ces différences font partie intégrante de l'étude. Vous êtes entièrement libre de suivre ou non ce qui est proposé.
+    </p>
+    <p>
+      <strong>Attention :</strong> Comme toute IA générative, cet assistant peut parfois générer des informations inexactes, hors sujet ou commettre des erreurs de raisonnement. Vous devez donc faire preuve de discernement quant aux conseils qu'il vous donne.
+    </p>
+    <button id="btn-accept-popup" class="btn btn-primary" type="button" disabled>J'ai compris (patientez 15s)</button>
+  </div>
+</div>
+{% endif %}
+
+<!-- Message d'attente après acceptation de la popup (l'autre participant doit aussi accepter) -->
+<div id="post-popup-waiting" class="alert-box" style="display: none;">
+  <strong>Merci d'avoir pris connaissance de ces informations.</strong> En attente de l'autre participant…
+  <div class="dots-loader"><span></span><span></span><span></span></div>
+</div>
+
+<!-- Overlay de reconnexion partenaire (Bilendi) -->
+<div id="reconnect-overlay" class="modal-overlay" style="display: none;">
+  <div class="modal-content reconnect-modal">
+    <div class="reconnect-modal__icon">⚠️</div>
+    <h4>Votre partenaire s'est déconnecté</h4>
+    <p id="reconnect-countdown-text">
+      Votre partenaire a quitté la session de jeu. Il peut se reconnecter dans les
+      <strong><span id="reconnect-countdown-minutes">5</span> min <span id="reconnect-countdown-seconds">00</span> s</strong>
+      qui suivent.
+    </p>
+    <p class="text-muted">
+      Si votre partenaire ne se reconnecte pas dans ce délai, cette étape sera automatiquement sautée
+      et vous passerez à la suite de l'expérience.
+    </p>
+    <div id="reconnect-status" style="display: none;" class="alert-box">
+      <strong>Délai expiré.</strong> Cette étape va être sautée.
+    </div>
+  </div>
+</div>
+
+<!-- Overlay partenaire revenu (Bilendi) -->
+<div id="reconnect-back-overlay" class="modal-overlay" style="display: none;">
+  <div class="modal-content reconnect-modal reconnect-modal--success">
+    <div class="reconnect-modal__icon">✓</div>
+    <h4>Votre partenaire est de retour</h4>
+    <p>Le jeu reprend.</p>
+  </div>
+</div>
+
 <div class="gameplay-layout">
 
   <!-- En-tête : badge rôle + timer -->
@@ -12,8 +83,8 @@
     <span class="badge badge--role">
       {% if player.id_in_group == 1 %}Joueur A{% else %}Joueur B{% endif %}
     </span>
-    {% if has_chat_gpt or player.has_cheap_talk %}
-    <div id="time" class="chat-timer" aria-live="polite">
+    {% if has_chat_gpt %}
+    <div id="time" class="chat-timer" aria-live="polite" style="display: none;">
       <span class="chat-timer__icon" aria-hidden="true">⏱</span>
       <span id="time_remaining">{{ C.CHAT_DURATION }}</span>s
       <span id="timer_label"></span>
@@ -22,51 +93,16 @@
   </div>
 
   <!-- Zone chat -->
-  {% if has_chat_gpt or player.has_cheap_talk %}
-  <div class="chat-section">
-
-    <!-- Onglets mobile (masqués sur desktop via CSS ≥1024px) -->
-    {% if has_chat_gpt and player.has_cheap_talk %}
-    <div class="chat-tabs" role="tablist">
-      <button type="button" class="chat-tab active" id="tab-p2p" role="tab"
-              aria-selected="true" aria-controls="panel-p2p"
-              onclick="switchTab('p2p')">Discussion</button>
-      <button type="button" class="chat-tab" id="tab-gpt" role="tab"
-              aria-selected="false" aria-controls="panel-gpt"
-              onclick="switchTab('gpt')">Assistant IA</button>
-    </div>
-    {% endif %}
-
+  {% if has_chat_gpt %}
+  <div class="chat-section" id="ai-chat-section" style="display: none;">
     <div class="chat-columns">
-
-      <!-- Panneau P2P -->
-      {% if player.has_cheap_talk %}
-      <div class="chat-panel {% if not has_chat_gpt %}active{% else %}active{% endif %}"
-           id="panel-p2p" role="tabpanel" aria-labelledby="tab-p2p">
-        <div class="chat-column__header">Discussion avec l'autre joueur</div>
-        <div id="chat_history" class="chat-messages">{{ chat_history|safe }}</div>
-        <div id="typing_indicator" class="typing-indicator d-none">
-          <span class="dots-loader" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span>L'autre joueur écrit…</span>
-        </div>
-        <div class="chat-input-area">
-          <input type="text" id="chat_input" placeholder="Écrire un message…"
-                 disabled autocomplete="off" />
-          <button id="send_msg_button" class="btn-send" type="button" disabled>Envoyer</button>
-        </div>
-      </div>
-      {% endif %}
-
       <!-- Panneau GPT -->
-      {% if has_chat_gpt %}
-      <div class="chat-panel {% if not player.has_cheap_talk %}active{% endif %}"
-           id="panel-gpt" role="tabpanel" aria-labelledby="tab-gpt">
+      <div class="chat-panel active" id="panel-gpt" role="tabpanel" aria-labelledby="tab-gpt">
         <div class="chat-column__header">Assistant IA</div>
         <div id="chatbox-gpt" class="chat-messages">{{ gpt_history|safe }}</div>
-        <div id="gpt-thinking" class="gpt-thinking">
-          <div class="chat-bubble chat-bubble--gpt">
-            <span class="dots-loader" aria-hidden="true"><span></span><span></span><span></span></span>
-          </div>
+        <div id="gpt-thinking" class="gpt-thinking" style="display: none;">
+          <span class="gpt-thinking__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="gpt-thinking__label">IA en train d'écrire…</span>
         </div>
         <div class="chat-input-area">
           <input id="user-gpt-input" type="text"
@@ -74,23 +110,21 @@
           <button id="send-gpt-button" class="btn-send" type="button">Envoyer</button>
         </div>
       </div>
-      {% endif %}
-
     </div><!-- .chat-columns -->
   </div><!-- .chat-section -->
 
-  <div class="alert-box">
+  <div class="alert-box" id="ai-note" style="display: none;">
     <strong>Note :</strong> Vous pouvez prendre votre décision avant ou après la fin du temps de communication.
   </div>
   {% endif %}
 
   <!-- Section jeu principale -->
-  <div class="experiment-card">
+  <div class="experiment-card" id="experiment-card" {% if has_chat_gpt %}style="display: none;"{% endif %}>
 
     {% if player.id_in_group == 1 %}
     <!-- Interface Joueur A -->
     <div id="playerA_interface">
-      <p>Vous avez <strong>{{ C.ENDOWMENT }} jetons</strong>.</p>
+      <p>Vous avez <strong>{{ C.ENDOWMENT }}€</strong>.</p>
       <p>Combien souhaitez-vous envoyer au Joueur B ?</p>
 
       <div class="token-input">
@@ -103,9 +137,9 @@
                  min="0" max="{{ C.ENDOWMENT }}" value="0" step="1" required />
         </div>
         <div id="amount_preview" class="token-input__preview">
-          Vous envoyez 0 → le Joueur B recevra 0 jeton
+          Vous envoyez 0 → le Joueur B recevra 0€
         </div>
-        <div id="amount_error" class="token-input__error">
+        <div id="amount_error" class="token-input__error" style="display: none;">
           Veuillez entrer un montant entre 0 et {{ C.ENDOWMENT }}.
         </div>
       </div>
@@ -113,7 +147,7 @@
       <button id="send_button" class="btn btn-primary" type="button">Envoyer</button>
 
       <div id="waiting_message" class="alert-box d-none">
-        Vous avez envoyé <strong><span id="sent_amount"></span> jeton(s)</strong>. En attente du Joueur B…
+        Vous avez envoyé <strong><span id="sent_amount"></span>€</strong>. En attente du Joueur B…
       </div>
     </div>
 
@@ -126,11 +160,11 @@
       </div>
 
       <div id="received_amount_display" class="d-none">
-        <p>Le Joueur A vous a envoyé <strong><span id="received_amount"></span> jeton(s)</strong>.</p>
+        <p>Le Joueur A vous a envoyé <strong><span id="received_amount"></span>€</strong>.</p>
         <p>Ce montant a été multiplié par {{ C.MULTIPLIER }}, vous avez donc reçu
-           <strong><span id="tripled_amount_1"></span> jeton(s)</strong>.</p>
+           <strong><span id="tripled_amount_1"></span>€</strong>.</p>
         <p>Combien souhaitez-vous renvoyer au Joueur A ?
-           (entre 0 et <span id="tripled_amount_2"></span> jetons)</p>
+           (entre 0 et <span id="tripled_amount_2"></span>€)</p>
 
         <div class="token-input">
           <div class="token-input__row">
@@ -141,9 +175,9 @@
                    min="0" value="0" step="1" required />
           </div>
           <div id="amount_back_preview" class="token-input__preview">
-            Vous renvoyez 0 jeton
+            Vous renvoyez 0€
           </div>
-          <div id="amount_back_error" class="token-input__error">
+          <div id="amount_back_error" class="token-input__error" style="display: none;">
             Veuillez entrer un montant valide.
           </div>
         </div>
@@ -168,43 +202,19 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{% static 'trust_game/script.js' %}"></script>
 <script>
   const has_chat_gpt = "{{ has_chat_gpt }}" === "True";
-  const has_cheap_talk = "{{ player.has_cheap_talk }}" === "True";
-  let inputCheapTalk;
-  let buttonCheapTalk;
   let inputGPT;
   let buttonGPT;
   let chatBoxGPT;
 
-  let expireTime = parseFloat("{{ group.expire_time }}");
+  let expireTime = js_vars.expire_time;
   let timeRemaining;
   let chatTimer;
-  let typingTimer;
-  let isTyping = false;
 
-  const doneTypingInterval = 1000;
   const roleIsPlayerA = js_vars.id_in_group === 1;
   let canProceed = false;
-
-  /* ── Onglets mobile ── */
-  function switchTab(tab) {
-    const p2p = document.getElementById('panel-p2p');
-    const gpt = document.getElementById('panel-gpt');
-    const tabP2P = document.getElementById('tab-p2p');
-    const tabGPT = document.getElementById('tab-gpt');
-    if (tab === 'p2p') {
-      if (p2p) p2p.classList.add('active');
-      if (gpt) gpt.classList.remove('active');
-      if (tabP2P) { tabP2P.classList.add('active'); tabP2P.setAttribute('aria-selected','true'); }
-      if (tabGPT) { tabGPT.classList.remove('active'); tabGPT.setAttribute('aria-selected','false'); }
-    } else {
-      if (gpt) gpt.classList.add('active');
-      if (p2p) p2p.classList.remove('active');
-      if (tabGPT) { tabGPT.classList.add('active'); tabGPT.setAttribute('aria-selected','true'); }
-      if (tabP2P) { tabP2P.classList.remove('active'); tabP2P.setAttribute('aria-selected','false'); }
-    }
-  }
 
   /* ── Slider Joueur A ── */
   function setupSliderA() {
@@ -217,7 +227,7 @@
       val = Math.min(Math.max(parseInt(val) || 0, 0), js_vars.endowment);
       slider.value = val; input.value = val;
       const received = val * mult;
-      preview.textContent = `Vous envoyez ${val} → le Joueur B recevra ${received} jeton${received !== 1 ? 's' : ''}`;
+      preview.textContent = `Vous envoyez ${val}€ → le Joueur B recevra ${received}€`;
       preview.classList.add('animate');
       setTimeout(() => preview.classList.remove('animate'), 150);
     }
@@ -236,7 +246,7 @@
     function updateB(val) {
       val = Math.min(Math.max(parseInt(val) || 0, 0), max);
       slider.value = val; input.value = val;
-      preview.textContent = `Vous renvoyez ${val} jeton${val !== 1 ? 's' : ''}`;
+      preview.textContent = `Vous renvoyez ${val}€`;
       preview.classList.add('animate');
       setTimeout(() => preview.classList.remove('animate'), 150);
     }
@@ -247,34 +257,9 @@
 
   /* ── Initialisation ── */
   document.addEventListener("DOMContentLoaded", function () {
-    inputCheapTalk = document.getElementById("chat_input");
-    buttonCheapTalk = document.getElementById("send_msg_button");
     inputGPT = document.getElementById("user-gpt-input");
     buttonGPT = document.getElementById("send-gpt-button");
     chatBoxGPT = document.getElementById("chatbox-gpt");
-
-    if (has_chat_gpt || has_cheap_talk) {
-      chatTimer = setInterval(updateChatTimer, 1000);
-    }
-
-    if (has_cheap_talk && inputCheapTalk) {
-      inputCheapTalk.disabled = false;
-      buttonCheapTalk.disabled = false;
-      buttonCheapTalk.addEventListener("click", function (e) {
-        e.preventDefault();
-        sendChatMessage(inputCheapTalk);
-      });
-      inputCheapTalk.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") { e.preventDefault(); sendChatMessage(inputCheapTalk); return; }
-        if (!isTyping && timeRemaining > 0) { isTyping = true; liveSend({ typing_status: true }); }
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(doneTyping, doneTypingInterval);
-      });
-      inputCheapTalk.addEventListener("blur", function () {
-        clearTimeout(typingTimer);
-        if (isTyping) doneTyping();
-      });
-    }
 
     if (roleIsPlayerA) {
       setupSliderA();
@@ -297,34 +282,80 @@
       });
     }
 
+    // Gestion de la popup ou démarrage direct
+    if (has_chat_gpt && "{{ player.popup_accepted }}" !== "True") {
+      const popup = document.getElementById("ai-popup");
+      const btnAccept = document.getElementById("btn-accept-popup");
+      
+      if (popup && btnAccept) {
+          let countdown = 15;
+          const interval = setInterval(() => {
+            countdown--;
+            if(countdown > 0) {
+              btnAccept.textContent = `J'ai compris (patientez ${countdown}s)`;
+            } else {
+              clearInterval(interval);
+              btnAccept.textContent = "J'ai compris";
+              btnAccept.disabled = false;
+            }
+          }, 1000);
+
+          btnAccept.addEventListener("click", function(event) {
+            event.preventDefault();
+            popup.style.display = "none";
+            document.getElementById("post-popup-waiting").style.display = "block";
+            liveSend({ "popup_accepted": true });
+          });
+      }
+    } else if (!has_chat_gpt) {
+      // Pour le traitement "Contrôle", on accepte automatiquement pour lancer le timer
+      if ("{{ player.popup_accepted }}" !== "True") {
+          liveSend({ "popup_accepted": true });
+      }
+      document.getElementById("experiment-card").style.display = "block";
+    }
+
+    const isDemoMode = js_vars.demo_mode === true;
+    const popupAlreadyAccepted = "{{ player.popup_accepted }}" === "True";
+
+    if (popupAlreadyAccepted && expireTime > 0) {
+        // Reload après start_timer : flux normal (chrono déjà connu).
+        showGameElements();
+        chatTimer = setInterval(updateChatTimer, 1000);
+        autoInitChat();
+    } else if (isDemoMode && has_chat_gpt && popupAlreadyAccepted) {
+        // Mode démo nominal : popup déjà acceptée par creating_session,
+        // on lance la séquence pédagogique. Le chrono démarrera après finalizeDemo.
+        showGameElements();
+        runDemoSequence();
+    }
+    // Sinon : popup affichée, on attend que l'utilisateur clique "J'ai compris".
+    // En mode normal, la démo sera déclenchée par handleStartTimer après acceptation.
+
     liveSend({ request_chat_history: true });
     refreshFromSavedData();
 
-    // Scroll en bas des historiques chargés depuis le template
-    ['chat_history','chatbox-gpt'].forEach(id => {
+    ['chatbox-gpt'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.scrollTop = el.scrollHeight;
     });
 
-    // --- Heartbeat : ping toutes les 30s pour détecter les abandons ---
     setInterval(() => liveSend({ ping: true }), 30000);
-
-    // --- Signal de fermeture de page ---
-    window.addEventListener('beforeunload', () => liveSend({ leaving: true }));
+    if ("{{ demo_mode }}" !== "True") {
+      window.addEventListener('beforeunload', () => liveSend({ leaving: true }));
+    }
   });
 
-  // handler pour les messages serveur → client
-  function liveRecv(data) {
-    if (data.partner_left) {
-      showToast("Votre partenaire a quitté la session. Contactez l'expérimentateur.", "error");
-      // Désactiver les champs de chat
-      ['chat_input','send_msg_button','user-gpt-input','send-gpt-button'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.disabled = true;
-      });
+  function showGameElements() {
+    document.getElementById("post-popup-waiting").style.display = "none";
+    document.getElementById("experiment-card").style.display = "block";
+    if (has_chat_gpt) {
+      document.getElementById("ai-chat-section").style.display = "block";
+      document.getElementById("time").style.display = "block";
+      document.getElementById("ai-note").style.display = "block";
     }
-    if (typeof handleLiveData === 'function') handleLiveData(data);
   }
+
+  // le handler liveRecv est délégué à script.js
 </script>
-<script src="{% static 'trust_game/script.js' %}"></script>
 {% endblock %}

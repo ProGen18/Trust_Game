@@ -99,7 +99,7 @@ function refreshFromSavedData() {
     liveRecv(data_complete);
   }
 }
-// fonctions d'envoi de jetons
+// fonctions d'envoi de€
 function sendTokens() {
   const amountInput = document.getElementById("amount_input");
   const amount = parseInt(amountInput.value);
@@ -143,9 +143,9 @@ function resultsPlayerA(data) {
   const finalBalance = js_vars.endowment - amountSent + amountReceived;
 
   resultsDiv.innerHTML = `
-        <p>Vous avez envoyé ${amountSent} jetons au Joueur B.</p>
-        <p>Le Joueur B vous a renvoyé ${amountReceived} jetons.</p>
-        <p><strong>Votre solde final: ${finalBalance} jetons</strong></p>
+        <p>Vous avez envoyé ${amountSent}€ au Joueur B.</p>
+        <p>Le Joueur B vous a renvoyé ${amountReceived}€.</p>
+        <p><strong>Votre solde final: ${finalBalance}€</strong></p>
       `;
 }
 
@@ -157,9 +157,9 @@ function resultsPlayerB(data) {
   const finalBalance = tripledAmount - amountSentBack;
 
   resultsDiv.innerHTML = `
-        <p>Vous avez reçu ${tripledAmount} jetons (${amountReceived} × ${js_vars.multiplier}).</p>
-        <p>Vous avez renvoyé ${amountSentBack} jetons au Joueur A.</p>
-        <p><strong>Votre solde final: ${finalBalance} jetons</strong></p>
+        <p>Vous avez reçu ${tripledAmount}€ (${amountReceived} × ${js_vars.multiplier}).</p>
+        <p>Vous avez renvoyé ${amountSentBack}€ au Joueur A.</p>
+        <p><strong>Votre solde final: ${finalBalance}€</strong></p>
       `;
 }
 
@@ -512,14 +512,14 @@ test("function handleReceivedStatus", () => {
 
 test("function resultsPlayerA", () => {
   const fakeFinalResultsContent = createElement("div", "final_results_content");
-  const data = { amount_sent: 7, amount_sent_back: 12 };
+  const data = { amount_sent: 3, amount_sent_back: 1 };
   const expectedInnerHTML = `
-        <p>Vous avez envoyé 7 jetons au Joueur B.</p>
-        <p>Le Joueur B vous a renvoyé 12 jetons.</p>
-        <p><strong>Votre solde final: 15 jetons</strong></p>
+        <p>Vous avez envoyé 3€ au Joueur B.</p>
+        <p>Le Joueur B vous a renvoyé 1€.</p>
+        <p><strong>Votre solde final: 3€</strong></p>
       `;
   roleIsPlayerA = true;
-  js_vars = { endowment: 10 };
+  js_vars = { endowment: 5 };
 
   resultsPlayerA(data);
 
@@ -528,11 +528,11 @@ test("function resultsPlayerA", () => {
 
 test("function resultsPlayerB", () => {
   const fakeFinalResultsContent = createElement("div", "final_results_content");
-  const data = { amount_sent: 7, tripled_amount: 21, amount_sent_back: 12 };
+  const data = { amount_sent: 3, tripled_amount: 9, amount_sent_back: 1 };
   const expectedInnerHTML = `
-        <p>Vous avez reçu 21 jetons (7 × 3).</p>
-        <p>Vous avez renvoyé 12 jetons au Joueur A.</p>
-        <p><strong>Votre solde final: 9 jetons</strong></p>
+        <p>Vous avez reçu 9€ (3 × 3).</p>
+        <p>Vous avez renvoyé 1€ au Joueur A.</p>
+        <p><strong>Votre solde final: 8€</strong></p>
       `;
   roleIsPlayerA = false;
   js_vars = { multiplier: 3 };

@@ -67,7 +67,7 @@ def test_condition_met():
         result = player.condition_met(i)
         assert result == False
 
-    set_inv(player, [10, 10, 0, 0])
+    set_inv(player, [5, 5, 0, 0])
     for i in range(5, 9):
         result = player.condition_met(i)
         assert result == True
@@ -94,7 +94,7 @@ def test_get_visible_index():
         assert result == 4
 
     # toutes s'affichent
-    set_inv(player, [10, 10, 0, 0])
+    set_inv(player, [5, 5, 0, 0])
     result = player.get_visible_index(5)
     assert result == 6
     result = player.get_visible_index(6)

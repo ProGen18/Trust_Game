@@ -36,13 +36,18 @@
   </div>
 
   <div class="button-container mt-4">
-    <button type="button" class="btn btn-back" onclick="window.history.back()">← Retour</button>
+    <button class="btn btn-back" type="submit" name="go_back" value="1" formnovalidate>← Retour</button>
     {{ next_button }}
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) { window.location.reload(); }
+}
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     function limitCheckboxes(groupSelector, maxAllowed) {

@@ -1,0 +1,15 @@
+# Pyrefly configuration for oTree project
+# oTree's DSL causes false positives that Pyrefly can't resolve correctly:
+# - model field constructors (BooleanField, StringField, etc.) are mistaken for builtins
+# - Page method signatures (vars_for_template, before_next_page, etc.) use Player annotation
+
+[[sub-config]]
+matches = "questionnaire/**"
+[sub-config.errors]
+unexpected-keyword = false
+
+[[sub-config]]
+matches = "risk_aversion/**"
+[sub-config.errors]
+unexpected-keyword = false
+invalid-annotation = false

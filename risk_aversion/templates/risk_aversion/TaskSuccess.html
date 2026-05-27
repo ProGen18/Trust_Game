@@ -13,11 +13,11 @@
 
         <div class="intro-section">
             <p class="task-description">
-                Ces jetons vous serviront lors d’une série de jeux de hasard (entre 4 et 8 jeux). <br>
+                Ce gain vous servira lors d'une série de jeux de hasard (entre 4 et 8 jeux). <br>
                 Au cours de chaque jeu, vous devrez prendre une décision. <br>
-                Les décisions sont indépendantes les unes des autres : cela signifie que ce que vous choisirez dans un jeu n’aura aucune influence sur vos gains et pertes des autres jeux. <br>
-                À la fin de l’expérimentation, une seule de vos décisions sera tirée au sort pour déterminer votre gain final. <br>
-                Ainsi, tout se passe comme si vous commenciez chaque jeu avec vos {{ player.payoff | to0 }} de départ.
+                Les décisions sont indépendantes les unes des autres : cela signifie que ce que vous choisirez dans un jeu n'aura aucune influence sur vos gains et pertes des autres jeux. <br>
+                À la fin de l'expérimentation, une seule de vos décisions sera tirée au sort pour déterminer votre gain final. <br>
+                Ainsi, tout se passe comme si vous commenciez chaque jeu avec vos {{ player.payoff | to0 }}€ de départ.
             </p>
         </div>
 
@@ -33,9 +33,19 @@
     </div>
 
     <div class="button-container">
-        <button type="button" class="btn btn-back" onclick="window.history.back()">← Retour</button>
+        <button type="button" class="btn btn-back" onclick="liveSend({'go_back': true})">← Retour</button>
         {{ next_button }}
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
 {% endblock %}

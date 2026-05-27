@@ -24,7 +24,7 @@
     <div class="result-section__body">
       <div class="result-row" id="row-showup">
         <span class="result-row__label">Show-up fee</span>
-        <span class="result-row__value">{{ show_up_fee | to0 }} jetons</span>
+        <span class="result-row__value">{{ show_up_fee | to0 }}€</span>
       </div>
     </div>
   </div>
@@ -54,26 +54,26 @@
       </div>
       <div class="result-row" id="row-initial">
         <span class="result-row__label">Somme initiale</span>
-        <span class="result-row__value">{{ initial_amount | to0 }} jetons</span>
+        <span class="result-row__value">{{ initial_amount | to0 }}€</span>
       </div>
       <div class="result-row" id="row-profit-ra">
         <span class="result-row__label">Profit du tirage</span>
-        <span class="result-row__value">{{ profit_risk_aversion | to0 }} jetons</span>
+        <span class="result-row__value">{{ profit_risk_aversion | to0 }}€</span>
       </div>
       <div class="result-row result-row--section-total" id="row-gain-ra">
         <span class="result-row__label">Sous-total tirage au sort</span>
-        <span class="result-row__value">{{ gain_risk_aversion | to0 }} jetons</span>
+        <span class="result-row__value">{{ gain_risk_aversion | to0 }}€</span>
       </div>
     </div>
   </div>
 
-  <!-- SECTION 3 — Jeu de confiance -->
+  <!-- SECTION 3 — Jeu experimental -->
   {% if tg_role %}
   <div class="result-section" id="section-trust-game">
     <div class="result-section__header">
       <div>
         <h3 class="result-section__title">
-          <i class="fa-solid fa-people-arrows"></i> Jeu de confiance
+          <i class="fa-solid fa-people-arrows"></i> Jeu experimental
         </h3>
         <p class="result-section__subtitle">Interaction avec votre partenaire</p>
       </div>
@@ -99,8 +99,8 @@
       </div>
       {% endif %}
       <div class="result-row result-row--section-total" id="row-tg-gain">
-        <span class="result-row__label">Sous-total jeu de confiance</span>
-        <span class="result-row__value">{{ tg_gain | to0 }} jetons</span>
+        <span class="result-row__label">Sous-total Jeu experimental</span>
+        <span class="result-row__value">{{ tg_gain | to0 }}€</span>
       </div>
     </div>
   </div>
@@ -116,8 +116,8 @@
     </div>
     <div class="result-section__body">
       <div class="result-row result-row--total" id="row-total">
-        <span class="result-row__label">Gain total (jetons)</span>
-        <span class="result-row__value">{{ gain_total | to0 }} jetons</span>
+        <span class="result-row__label">Gain total (€)</span>
+        <span class="result-row__value">{{ gain_total | to0 }}€</span>
       </div>
       <div class="result-row result-row--total result-row--euros" id="row-euros">
         <span class="result-row__label">Gain total (€)</span>

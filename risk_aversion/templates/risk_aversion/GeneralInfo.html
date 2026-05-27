@@ -13,8 +13,7 @@
         </li>
         <li><i class="fa-solid fa-dice" class="icon--ink"></i> Une série de décisions mettant en jeu tout ou partie des {{ C.ENDOWMENT | to0 }} que vous aurez gagnés.</li>
         <li>
-            Pour le calcul de vos gains finaux, le taux de conversion sera le suivant : 1 jeton = {{ rate }} centimes d’euros. <br>
-            Ainsi, {{ C.ENDOWMENT | to0 }} valent {{ exemple1_euros }} euros et {{ exemple2 | to0 }} valent {{ exemple2_euros }} euros. 
+            Tous les montants sont exprimés directement en euros (€).
         </li>
     </ul>
 
@@ -25,7 +24,7 @@
     </div>
 
     <div class="button-container">
-        <button type="button" class="btn btn-back" onclick="window.history.back()">← Retour</button>
+        <button type="button" class="btn btn-back" onclick="liveSend({'go_back': true})">← Retour</button>
         {{ next_button }}
     </div>
 </div>
@@ -36,3 +35,13 @@
 
 
 
+
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
+{% endblock %}

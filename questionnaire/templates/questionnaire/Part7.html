@@ -21,13 +21,18 @@
   {{ formfield 'q40' }}
 
   <div class="button-container mt-4">
-    <button type="button" class="btn btn-back" onclick="window.history.back()">← Retour</button>
+    <button class="btn btn-back" type="submit" name="go_back" value="1" formnovalidate>← Retour</button>
     {{ next_button }}
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) { window.location.reload(); }
+}
+</script>
 <datalist id="pays-list">
   <option value="Afghanistan"><option value="Afrique du Sud"><option value="Albanie"><option value="Algérie"><option value="Allemagne"><option value="Andorre"><option value="Angola"><option value="Antigua-et-Barbuda"><option value="Arabie saoudite"><option value="Argentine"><option value="Arménie"><option value="Australie"><option value="Autriche"><option value="Azerbaïdjan">
   <option value="Bahamas"><option value="Bahreïn"><option value="Bangladesh"><option value="Barbade"><option value="Belgique"><option value="Belize"><option value="Bénin"><option value="Bhoutan"><option value="Biélorussie"><option value="Birmanie"><option value="Bolivie"><option value="Bosnie-Herzégovine"><option value="Botswana"><option value="Brésil"><option value="Brunei"><option value="Bulgarie"><option value="Burkina Faso"><option value="Burundi">

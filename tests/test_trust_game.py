@@ -2,8 +2,6 @@ import pytest
 from unittest.mock import MagicMock
 from trust_game import (
     set_chat_options,
-    handle_chat_message,
-    handle_typing_status,
     handle_amount_sent,
     handle_amount_sent_back,
 )
@@ -71,80 +69,22 @@ def test_set_chat_options(i, expected_behavior, expected_cheap_talk):
     assert player.has_cheap_talk == expected_cheap_talk
 
 
-def test_handle_chat_message():
-    """Teste l'envoi de messages entre joueurs et la mise à jour de l'historique partagé."""
-    players = mock_group()
-    player_A = players[0]
-    player_B = players[1]
-
-    data_1 = {"message": "Ceci est un message"}
-    expected_message_1 = "<strong>Joueur A:</strong> Ceci est un message<br>"
-    expected_result_1 = {
-        1: {"new_message": expected_message_1, "sender_id": 1},
-        2: {"new_message": expected_message_1, "sender_id": 1},
-    }
-
-    result = handle_chat_message(player_A, data_1)
-
-    assert player_A.chat_history == expected_message_1
-    assert player_B.chat_history == expected_message_1
-    assert result == expected_result_1
-
-    data_2 = {"message": "Voici un autre"}
-    expected_message_2 = "<strong>Joueur B:</strong> Voici un autre<br>"
-    expected_result_2 = {
-        1: {"new_message": expected_message_2},
-        2: {"new_message": expected_message_2},
-    }
-
-    result = handle_chat_message(player_B, data_2)
-
-    assert result == expected_result_2
-    assert player_A.chat_history == expected_message_1 + expected_message_2
-    assert player_B.chat_history == expected_message_1 + expected_message_2
-
-
-def test_handle_chat_message_but_no_msg():
-    """Vérifie que le système ignore les données ne contenant pas de message valide."""
-    players = mock_group()
-    player_A = players[0]
-    data = {"toto": "titi"}
-
-    result = handle_chat_message(player_A, data)
-    assert result == None
-
-
-def test_handle_typing_status():
-    """Teste la transmission de l'état 'en cours de saisie' au partenaire."""
-    players = mock_group()
-    player_A = players[0]
-    player_B = players[1]
-
-    # player_A est en train d'écrire
-    result = handle_typing_status(player_A, {"typing_status": True})
-    assert result == {2: {"other_player_typing": True, "player_id": 1}}
-
-    # player_B arrête d'écrire
-    result = handle_typing_status(player_B, {"typing_status": False})
-    assert result == {1: {"other_player_typing": False, "player_id": 2}}
-
-
 def test_handle_amount_sent():
     """Teste le transfert de jetons par le Joueur A."""
     players = mock_group()
     player_A = players[0]
 
-    data = {"amount_sent": "7"}
+    data = {"amount_sent": "3"}
     result = handle_amount_sent(player_A, data)
     expected_result = {
         1: {
             "status": "sent",
-            "amount_sent": 7,
+            "amount_sent": 3,
         },
         2: {
             "status": "received",
-            "amount_sent": 7,
-            "tripled_amount": 21,
+            "amount_sent": 3,
+            "tripled_amount": 9,
         },
     }
     assert result == expected_result

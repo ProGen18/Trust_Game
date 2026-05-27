@@ -1,25 +1,35 @@
 {% extends "global/Page.html" %}
-{% block title %}Instructions — Jeu de confiance{% endblock %}
+{% block title %}Instructions — Jeu experimental{% endblock %}
 {% block content %}
 <div class="experiment-card">
   <span class="eyebrow">Instructions</span>
-  <h1>Jeu de confiance</h1>
+  <h1>Jeu experimental</h1>
 
   <p>Ce jeu se joue à deux personnes : un joueur A et un joueur B.</p>
 
   <ul class="steps-list">
-    <li>Le joueur A reçoit <strong class="highlight">{{ C.ENDOWMENT }} jetons</strong>.</li>
+    <li>Le joueur A reçoit <strong class="highlight">{{ C.ENDOWMENT }}€</strong>.</li>
     <li>Il peut en envoyer une partie ou la totalité au joueur B.</li>
-    <li>Les jetons envoyés sont <strong>triplés</strong> lorsqu'ils arrivent chez le joueur B.</li>
+    <li>Le montant envoyé est <strong>triplé</strong> lorsqu'il arrive chez le joueur B.</li>
     <li>Le joueur B décide ensuite combien il souhaite renvoyer au joueur A.</li>
-    <li>Les jetons renvoyés par B ne sont pas multipliés.</li>
+    <li>Le montant renvoyé par B n'est pas multiplié.</li>
   </ul>
 
   <p>Commençons par un petit exemple pour vérifier votre compréhension.</p>
 
   <div class="button-container">
-    <button type="button" class="btn btn-back" onclick="window.history.back()">← Retour</button>
+    <button type="button" class="btn btn-back" onclick="liveSend({'go_back': true})">← Retour</button>
     {{ next_button }}
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
 {% endblock %}

@@ -155,7 +155,8 @@ li {
 .page-header {
   background: var(--parchment);
   border-bottom: 1px solid var(--border);
-  padding: var(--space-sm) var(--space-md);
+  min-height: 78px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -168,7 +169,7 @@ li {
   font-family: var(--font-titre);
   font-style: italic;
   font-weight: 400;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--ink-mid);
 }
 
@@ -181,13 +182,14 @@ li {
 /* Progress ticks (mobile) */
 .progress-ticks {
   display: flex;
-  gap: 4px;
-  padding: 0 var(--space-md) var(--space-sm);
+  gap: 6px;
+  padding: 10px 20px 14px;
   background: var(--parchment);
+  border-bottom: 1px solid var(--border);
 }
 
 .progress-tick {
-  height: 3px;
+  height: 4px;
   flex: 1;
   background: var(--border);
   border-radius: 0;
@@ -238,7 +240,8 @@ li {
   .progress-stepper {
     display: flex;
     align-items: center;
-    padding: var(--space-md) var(--space-xl);
+    min-height: 113px;
+    padding: 36px 10.8vw 20px;
     background: var(--parchment);
     border-bottom: 1px solid var(--border);
   }
@@ -254,7 +257,7 @@ li {
   .stepper-step:not(:last-child)::after {
     content: '';
     position: absolute;
-    top: 5px;
+    top: 7px;
     left: 50%;
     width: 100%;
     height: 2px;
@@ -263,12 +266,12 @@ li {
   }
 
   .stepper-step.done:not(:last-child)::after {
-    background: var(--rust);
+    background: var(--border);
   }
 
   .stepper-dot {
-    width: 12px;
-    height: 12px;
+    width: 17px;
+    height: 17px;
     border-radius: 0;
     background: var(--parchment);
     border: 2px solid var(--border);
@@ -278,8 +281,8 @@ li {
   }
 
   .stepper-step.done .stepper-dot {
-    background: var(--rust);
-    border-color: var(--rust);
+    background: var(--ink);
+    border-color: var(--ink);
   }
 
   .stepper-step.current .stepper-dot {
@@ -289,12 +292,13 @@ li {
 
   .stepper-label {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--ink-light);
-    margin-top: 10px;
+    margin-top: 17px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    text-align: center;
   }
 
   .stepper-step.current .stepper-label {
@@ -337,9 +341,14 @@ li {
 }
 
 .badge--step {
-  background: var(--parchment-2);
+  min-width: 52px;
+  min-height: 29px;
+  justify-content: center;
+  background: var(--parchment);
   color: var(--ink-light);
   border: 1px solid var(--border);
+  font-size: 0.72rem;
+  letter-spacing: 0;
 }
 
 .experiment-card {
@@ -479,6 +488,7 @@ button[type="submit"]:hover {
   border: none;
   cursor: pointer;
   width: auto;
+  min-height: var(--touch-target);
 }
 
 .btn-send:hover,
@@ -1054,15 +1064,18 @@ input[type="range"]::-moz-range-thumb {
 
 .chat-input-area {
   display: flex;
-  gap: 8px;
-  padding: 12px;
+  gap: 0;
   border-top: 1px solid var(--border);
   background: var(--parchment);
+  min-height: var(--touch-target);
 }
 
 .chat-input-area input {
   flex: 1;
   margin: 0;
+  min-height: var(--touch-target);
+  padding: 0 14px;
+  border: none;
 }
 
 .typing-indicator {
@@ -1078,11 +1091,138 @@ input[type="range"]::-moz-range-thumb {
 
 .gpt-thinking {
   display: none;
-  padding: var(--space-sm) var(--space-md);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
 }
 
-.gpt-thinking .chat-bubble--gpt {
+.gpt-thinking__dots {
   display: inline-flex;
+  gap: 4px;
+}
+
+.gpt-thinking__dots span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rust);
+  animation: bounce 1.2s infinite;
+}
+
+.gpt-thinking__dots span:nth-child(2) { animation-delay: 0.2s; }
+.gpt-thinking__dots span:nth-child(3) { animation-delay: 0.4s; }
+
+.gpt-thinking__label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-light);
+}
+
+.msg-ts {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--ink-light);
+  margin-top: 3px;
+  opacity: 0.7;
+}
+
+/* ── Démo interactive : overlay + flèches pédagogiques ── */
+
+.demo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 18, 8, 0.55);
+  z-index: 1000;
+  animation: demoOverlayFade 0.4s ease;
+  pointer-events: all;
+}
+
+.demo-overlay--fade-out {
+  animation: demoOverlayFadeOut 0.4s ease forwards;
+}
+
+.gameplay-layout.demo-active .chat-section {
+  position: relative;
+  z-index: 1002;
+  box-shadow: 0 0 0 3px var(--rust), 0 18px 40px rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-md, 8px);
+}
+
+.demo-arrow {
+  position: fixed;
+  z-index: 1003;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  animation: demoArrowAppear 0.35s ease, demoArrowFloat 1.6s ease-in-out 0.35s infinite;
+}
+
+.demo-arrow--ia {
+  flex-direction: row-reverse;
+}
+
+.demo-arrow__svg {
+  width: 64px;
+  height: 48px;
+  color: var(--rust);
+  filter: drop-shadow(0 2px 6px rgba(176, 92, 42, 0.4));
+  flex-shrink: 0;
+}
+
+.demo-arrow__label {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--rust);
+  background: var(--parchment);
+  padding: 6px 14px;
+  border: 2px solid var(--rust);
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.01em;
+}
+
+.demo-arrow--fade-out {
+  animation: demoArrowFadeOut 0.4s ease forwards;
+}
+
+@keyframes demoOverlayFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes demoOverlayFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes demoArrowAppear {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes demoArrowFloat {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-6px); }
+}
+
+.demo-arrow--ia {
+  animation: demoArrowAppear 0.35s ease, demoArrowFloatIA 1.6s ease-in-out 0.35s infinite;
+}
+
+@keyframes demoArrowFloatIA {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(6px); }
+}
+
+@keyframes demoArrowFadeOut {
+  to { opacity: 0; transform: translateX(8px); }
 }
 
 @media (min-width: 1024px) {
@@ -1091,7 +1231,7 @@ input[type="range"]::-moz-range-thumb {
 
   .chat-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--space-lg);
   }
 
@@ -2504,4 +2644,35 @@ html {
     left: 5%;
     right: 5%;
   }
+}
+
+/* ─── Reconnexion partenaire (Bilendi) ─── */
+
+.reconnect-modal {
+  max-width: 480px;
+  padding: var(--space-xl);
+}
+
+.reconnect-modal__icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.reconnect-modal--success {
+  border: 2px solid var(--success);
+}
+
+.reconnect-modal--success .reconnect-modal__icon {
+  color: var(--success);
+}
+
+#reconnect-countdown-minutes,
+#reconnect-countdown-seconds {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--rust);
+}
+
+#reconnect-back-overlay .modal-content {
+  animation: toastIn 0.3s ease-out;
 }

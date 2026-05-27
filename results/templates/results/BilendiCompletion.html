@@ -1,0 +1,22 @@
+{% extends "global/Page.html" %}
+
+{% block content %}
+<div style="max-width:650px;margin:0 auto;text-align:center;padding:3rem 1rem;">
+    <div style="
+        width:64px;height:64px;margin:0 auto 1.5rem;
+        background:#2e7d32;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    ">
+        <i class="fas fa-check" style="color:#fff;font-size:28px;"></i>
+    </div>
+    <h2 style="color:#2e7d32;margin-bottom:0.5rem;">Participation enregistrée</h2>
+    <p style="color:#5c4a3a;margin-bottom:1.5rem;">
+        Votre participation a bien été enregistrée. Vous pouvez fermer cette page.
+    </p>
+    <div style="background:#f5f0eb;border-radius:8px;padding:1rem;margin-bottom:1.5rem;">
+        <span style="color:#8b6914;font-weight:600;">Gain total : {{ total_gain }} €</span>
+    </div>
+    <p style="color:#8b6914;font-size:0.85rem;">
+        Un e-chèque cadeau Fnac Darty vous sera envoyé par Bilendi dans les jours suivant l'étude.
+    </p>
+</div>
+{% endblock %}

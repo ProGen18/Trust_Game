@@ -1,5 +1,5 @@
 {% extends "global/Page.html" %}
-{% block title %} Investissez vos jetons - Décision {{ player.confirmed_decision_count }} {% endblock %}
+{% block title %} Investissez - Décision {{ player.confirmed_decision_count }} {% endblock %}
 
 {% block content %}
 <div class="experiment-card">
@@ -13,4 +13,13 @@
 </div>
 
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
 {% endblock %}

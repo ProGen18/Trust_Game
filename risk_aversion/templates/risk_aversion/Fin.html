@@ -9,3 +9,12 @@
   </div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+function liveRecv(data) {
+    if (data.go_back_success) {
+        window.location.reload();
+    }
+}
+</script>
+{% endblock %}
