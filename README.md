@@ -11,6 +11,7 @@ Le projet a été développé pour évaluer comment les conseils donnés par une
 - **Module "Cheap Talk"** : Messagerie instantanée intégrée qui permet aux deux joueurs de discuter avec indicateur de frappe en temps réel avant leur prise de décision.
 - **Répartition Dynamique** : Module **Dispatcher** centralisé facilitant l'assignation automatique et fluide des cohortes de participants pour réaliser des traitements expérimentaux comparés (sessions de groupes modulables).
 - **Mesures d'Aversion au Risque & Questionnaire** : Modules pré-inclus pour récupérer des indicateurs clés utiles à la recherche par l'expérimentateur.
+- **Intégration Panel Bilendi** : Gestion automatique du flux de participants et de l'export des gains au format CSV (voir [BILENDI_README.md](file:///c:/Users/rita2/OneDrive/Bureau/stageL3/Trust-Game-AI/BILENDI_README.md)).
 
 ---
 
@@ -65,8 +66,8 @@ Ces instructions vous permettront de lancer le laboratoire localement pour la ph
 
 ### 2. Cloner le Projet & Environnement virtuel
 ```bash
-git clone https://github.com/votre-user/Trust-Game-AI.git
-cd Trust-Game-AI
+git clone https://github.com/ProGen18/Trust_Game.git
+cd Trust_Game
 
 # MacOS/Linux
 python3 -m venv venv
@@ -95,6 +96,9 @@ cp .env.example .env # (ou créez le fichier manuellement)
 # Authentification oTree
 OTREE_ADMIN_PASSWORD=monmotdepassesecret
 OTREE_AUTH_LEVEL=STUDY
+
+# Clé d'administration (sécurisation des accès d'administration)
+ADMIN_KEY=votre_cle_admin_secrete
 
 # Connexion API OpenAI
 OPENAI_API_KEY=sk-xxxxxxvotreclefxxxxxxx
@@ -150,6 +154,7 @@ Assignez manuellement chaque variable de votre `.env` à l'instance Heroku :
 heroku config:set OPENAI_API_KEY=sk-xxxxxxvotreclefxxxxxxx
 heroku config:set OTREE_PRODUCTION=1
 heroku config:set OTREE_ADMIN_PASSWORD=supermotdepasse
+heroku config:set ADMIN_KEY=votre_cle_admin_secrete
 heroku config:set OTREE_AUTH_LEVEL=STUDY
 heroku config:set IS_HEROKU=True
 heroku config:set GPT_BEHAVIOR="Votre_Comportement"
