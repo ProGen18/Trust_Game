@@ -201,7 +201,7 @@ CONVERSION_RATE = 1.0  # Taux de conversion entre les points du jeu et la monnai
 # 5. TRUST GAME — Paramètres du jeu de confiance
 # =============================================================================
 
-TG_ENDOWMENT = 5  # Dotation initiale des joueurs dans le Trust Game
+TG_ENDOWMENT = 10  # Dotation initiale des joueurs dans le Trust Game
 
 TG_MULTIPLIER = 3  # Facteur par lequel le montant envoyé par l'expéditeur est multiplié
 
